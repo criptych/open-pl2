@@ -1,0 +1,24 @@
+#summary Describes the PL2 file format.
+#labels Featured,FileFormat
+
+= PL2 File Format=
+PL2 files are just pak files, they contain all the other files that PL2 uses.
+The pak file format is simple, but unfortunately uses an odd compression system. At the moment this is unknown (although a tool called MltPL2.exe can decompress these files).
+
+== Layout Overview ==
+|| *Offset* || *Type*                    || *Description* ||
+|| 00h      || {{{u32[4]}}}              || Always 0's? What is this for? ||
+|| 10h      || {{{pl2PL2_Entry[]}}}      || Entries in the pak file ||
+
+
+== pl2PL2_Entry ==
+|| *Offset* || *Type*         || *Description* ||
+|| 00h      || {{{char[32]}}} || Name of the entry ||
+|| 20h      || {{{u32}}}      || Offset in bytes to start of file ||
+|| 24h      || {{{u32}}}      || Size of packed data in bytes ||
+|| 28h      || {{{u32}}}      || Size of unpacked data in bytes ||
+|| 2Ch      || {{{u32}}}      || Padding ^???^ ||
+
+== Data format ==
+The data is not stored raw, even when uncompressed.
+I can currently unpak uncompressed data, and will document how later on.
