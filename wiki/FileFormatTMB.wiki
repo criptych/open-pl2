@@ -1,25 +1,78 @@
 #summary Describes the format of the TMB file format used in PL2.
-#labels Featured,File-Format
+#labels Featured,FileFormat
 
 = TMB File Format=
-
 TMB files contain textures, materials, mesh and bones information.
 Work on fully reversing this format is not complete, there are still one or two things that are a mystery.
 All data is stored as little endian, uncompressed.
 
-= Layout Overview =
-
-Magic "TMB0"
-Count of textures
-    (Bunch of textures)
-Count of materials
-    (Bunch of materials)
-Count of meshes (objects)
-    (Bunch of meshes)
-Count of bones
-    (Bunch of bone matrices)
-Count of unknowns
-    (Bunch of unknowns)
-    (Bunch of unknown names)
 
 
+== Layout Overview ==
+|| *Offset* || *Type*              || *Description* ||
+|| 00h      || char[4]             || Magic "TMB0" ( 0x30424d54)||
+|| +00h     || u32                 || Texture count ||
+|| +04h     || pl2TMB_Texture[]    || Bunch of textures ||
+|| +00h     || u32                 || Material count ||
+|| +04h     || pl2TMB_Material[]   || Bunch of materials ||
+|| +00h     || u32                 || Mesh count ||
+|| +04h     || pl2TMB_Mesh[]       || Bunch of meshes ||
+|| +00h     || u32                 || Bone count ||
+|| +04h     || Mat44               || Bunch of bone matrices ||
+|| +00h     || u32                 || Unknown count ||
+|| +04h     || pl2TMB_Unknown[]    || Bunch of unknown things ||
+|| +04h     || char[]              || Bunch of nul terminated strings ||
+
+
+
+== pl2TMB_Texture ==
+All textures are 32BPP RGBA textures, and always seem to have power-of-two dimensions.
+
+|| *Offset* || *Type*   || *Description* ||
+|| 00h      || char[32] || Texture name (Include the extension of the source file) ||
+|| 20h      || u16      || Width in pixels ||
+|| 24h      || u16      || Height in pixels ||
+|| 26h      || RGBA32[] || Width*Height pixels ||
+
+
+
+== pl2TMB_Material ==
+The materials just carry the various colors used for lighting as well as a texture index.
+Currently the use of the colors is guessed, but seem to be working okay.
+
+|| *Offset* || *Type*   || *Description* ||
+|| 00h      || float[4] || Ambient color ^???^ ||
+|| 10h      || float[4] || Diffuse color ^???^ ||
+|| 20h      || float[4] || Specular color ^???^ ||
+|| 30h      || float[4] || Emission color ^???^ ||
+|| 40h      || float    || Shininess ^???^ ||
+|| 44h      || u32      || Texture ID (Points to one of the textures above) ||
+
+
+
+== pl2TMB_Mesh ==
+
+|| *Offset* || *Type*          || *Description* ||
+|| 00h      || u32             || Triangle count ||
+|| 04h      || u32             || Unknown! ^???^  ||
+|| 08h      || u32             || Material bind count ||
+|| 0Ch      || pl2TMB_Bind[]   || Material bindings ||
+|| +00h     || pl2TMB_Vertex[] || Vertex data (Triangle count*3) ||
+
+=== pl2TMB_Bind ===
+
+|| *Offset* || *Type* || *Description* ||
+|| 00h      || u32    || Material ID (Points to one of the materials above) ||
+|| 04h      || u32    || Start vertex (Index of the first vertex using this material)   ||
+|| 08h      || u32    || Triangle count (Number of triangle following start vertex that use this material) ||
+
+=== pl2TMB_Vertex ===
+An unused bone always has ID 0xff.
+
+|| *Offset* || *Type*   || *Description* ||
+|| 00h      || Vec3     || Vertex position ||
+|| 0Ch      || float[3] || Weights of each bone ||
+|| 18h      || u8[4]    || Bone IDs (forth ID isn't used) ||
+|| 1Ch      || Vec3     || Vertex normal ||
+|| 28h      || RGBA32   || Vertex color ^???^ ||
+|| 2Ch      || Vec2     || Texture coordinate ||
