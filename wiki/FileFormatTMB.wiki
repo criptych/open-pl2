@@ -1,0 +1,25 @@
+#summary Describes the format of the TMB file format used in PL2.
+#labels Featured,File-Format
+
+= TMB File Format=
+
+TMB files contain textures, materials, mesh and bones information.
+Work on fully reversing this format is not complete, there are still one or two things that are a mystery.
+All data is stored as little endian, uncompressed.
+
+= Layout Overview =
+
+Magic "TMB0"
+Count of textures
+    (Bunch of textures)
+Count of materials
+    (Bunch of materials)
+Count of meshes (objects)
+    (Bunch of meshes)
+Count of bones
+    (Bunch of bone matrices)
+Count of unknowns
+    (Bunch of unknowns)
+    (Bunch of unknown names)
+
+
