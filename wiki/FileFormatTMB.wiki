@@ -48,9 +48,8 @@ Currently the use of the colors is guessed, but seem to be working okay.
 || 40h      || {{{float}}}    || Shininess ^???^ ||
 || 44h      || {{{u32}}}      || Texture ID (Points to one of the textures above) ||
 
-
-
 == pl2TMB_Mesh ==
+The unknown field seems to be either 0 or 1....
 
 || *Offset* || *Type*                || *Description* ||
 || 00h      || {{{u32}}}             || Triangle count ||
@@ -68,6 +67,7 @@ Currently the use of the colors is guessed, but seem to be working okay.
 
 === pl2TMB_Vertex ===
 An unused bone always has ID 0xff.
+Weights should always add up to 1.0 (100%)
 
 || *Offset* || *Type*         || *Description* ||
 || 00h      || {{{Vec3}}}     || Vertex position ||
