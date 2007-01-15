@@ -21,4 +21,22 @@ The pak file format is simple, but unfortunately uses an odd compression system.
 
 == Data format ==
 The data is not stored raw, even when uncompressed.
-I can currently unpak uncompressed data, and will document how later on.
+I am relatively sure the compression system is based on LZ77 (Sliding Window) compression.
+Here's a rough overview of what I know so far.
+
+For uncompressed data there is a one byte marker followed by uncompressed data.
+The marker just specifies how much data follows, however it's not an integer like one would assume. You must do a leading one count on the marker... However if there are non-zeros after the leading one sequence that seems to mean that compressed data follows...
+
+For example
+
+|| *Hex* || *Binary* || *Description* ||
+|| {{{0xff}}}  || {{{11111111}}} || There are 8 bytes of uncompressed data following. ||
+|| {{{0x0f}}}  || {{{00001111}}} || There are 4 bytes of uncompressed data following. ||
+|| {{{0x01}}}  || {{{00000001}}} || There is 1 byte of uncompressed data following. ||
+|| {{{0x00}}}  || {{{00000000}}} || Seems to be end of data stream. ||
+|| {{{0xdf}}}  || {{{11011111}}} || There are five bytes of uncompressed data following, and some compressed data. ||
+|| {{{0xfe}}}  || {{{11111110}}} || Seems to mean no uncompressed data follows, but compressed data does. ||
+
+Comparing uncompressed text data with compressed text data, you can see that removed text has always appeared earlier in the stream, which is a sign of LZ77. I've yet to find a case where removed text appears later in the stream so it is probably not LZ78.
+
+I have yet to discover the encoding of the offset/length markers. When I do, full reading of the PL2 files should be possible.
