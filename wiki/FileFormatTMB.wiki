@@ -1,4 +1,4 @@
-#summary Describes the format of the TMB file format used in PL2.
+#summary Describes the TMB file format.
 #labels Featured,FileFormat
 
 = TMB File Format=
