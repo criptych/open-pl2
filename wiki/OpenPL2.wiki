@@ -13,6 +13,8 @@ The OpenGL "engine" code (thing that draws, resource manages, animates, etc) is 
 
 Why use QT4 anyway? It makes development much easier, since I don't have to worry about writing my own UI library, own dialogs, etc. And I have have loads of debug controls, etc.
 
+It uses shaders (written in Cg) so you'll need a video card (and driver) that supports shaders. I'm not sure what shader profile I'll end up using, but it'll probably be 2 or 3.
+
 *Status: Can load multiple models, supports lighting, etc*
 
 =TODO=
