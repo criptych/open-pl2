@@ -19,24 +19,25 @@ The pak file format is simple, but unfortunately uses an odd compression system.
 || 28h      || {{{u32}}}      || Size of unpacked data in bytes ||
 || 2Ch      || {{{u32}}}      || Padding ^???^ ||
 
-== Data format ==
+== Compression Format ==
 The data is not stored raw, even when uncompressed.
 I am relatively sure the compression system is based on LZ77 (Sliding Window) compression.
 Here's a rough overview of what I know so far.
 
-For uncompressed data there is a one byte marker followed by uncompressed data.
-The marker just specifies how much data follows, however it's not an integer like one would assume. You must do a leading one count on the marker... However if there are non-zeros after the leading one sequence that seems to mean that compressed data follows...
+There is a flag byte followed by eight data elements. A data element is either an uncompressed byte or a two byte compression pointer. Then after this another flag byte, etc, etc.
 
-For example
+A binary 1 in the flag byte corresponds to an uncompressed byte, a binary 0 in the flag byte corresponds to a lz77 pair (this is two bytes)
 
-|| *Hex* || *Binary* || *Description* ||
-|| {{{0xff}}}  || {{{11111111}}} || There are 8 bytes of uncompressed data following. ||
-|| {{{0x0f}}}  || {{{00001111}}} || There are 4 bytes of uncompressed data following. ||
-|| {{{0x01}}}  || {{{00000001}}} || There is 1 byte of uncompressed data following. ||
-|| {{{0x00}}}  || {{{00000000}}} || Seems to be end of data stream. ||
-|| {{{0xdf}}}  || {{{11011111}}} || There are five bytes of uncompressed data following, and some compressed data. ||
-|| {{{0xfe}}}  || {{{11111110}}} || Seems to mean no uncompressed data follows, but compressed data does. ||
+||*Binary*      || *Size*   ||*Description*||
+||{{{01111111}}}|| {{{9}}}  ||Seven uncompressed bytes, one lz77 pair ||
+||{{{11001111}}}|| {{{10}}} ||Four uncompressed bytes, two lz77 pairs, two uncompressed bytes.  ||
 
-Comparing uncompressed text data with compressed text data, you can see that removed text has always appeared earlier in the stream, which is a sign of LZ77. I've yet to find a case where removed text appears later in the stream so it is probably not LZ78.
+Of course, the format of the LZ77 pair is crucial to decompressing the data. It seems to be in 12/4 format. As in 12bits for the offset and 4bits for the length.
 
-I have yet to discover the encoding of the offset/length markers. When I do, full reading of the PL2 files should be possible.
+{{{OOOOOOO OOOOLLLL}}} (Where O is offset bit, L is length bit)
+
+If we add three to the length we can "decompress" (with trash data) to the correct file size. Why three? Well it'd be stupid to point to two bytes of data with a two byte pointer, so three bytes is the minimum you'd want to point to, therefor you might as well make 0=3.
+
+I can not relate the offset to data being referenced yet though. But we're getting closer!
+
+A pair set entirely to 0s (O=0, L=0) seems to terminate the stream.
