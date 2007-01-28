@@ -48,7 +48,9 @@ void pl2_outputHook(pl2_outputFunc func, void *user) {
 }
 
 const char *pl2_outputGet(u32 id) {
-	u32 nid = (CACHE_SIZE+(_cachePos-1)+id-1)&(CACHE_SIZE-1);
+	if (id>=_cacheSize)
+		return NULL;
+	u32 nid = (CACHE_SIZE+_cachePos-_cacheSize+id)&(CACHE_SIZE-1);
 	if (nid>=_cacheSize)
 		return NULL;
 
