@@ -18,7 +18,7 @@ All data is stored as little endian, uncompressed.
 || +00h     || {{{u32}}}                 || Mesh count ||
 || +04h     || {{{pl2TMB_Mesh[]}}}       || Bunch of meshes ||
 || +00h     || {{{u32}}}                 || Bone count ||
-|| +04h     || {{{Mat44}}}               || Bunch of bone matrices ||
+|| +04h     || {{{float[][16]}}}         || Bunch of matrices (4x4) ||
 || +00h     || {{{u32}}}                 || Unknown count ||
 || +04h     || {{{pl2TMB_Unknown[]}}}    || Bunch of unknown things ||
 || +04h     || {{{char[]}}}              || Bunch of nul terminated strings ||
@@ -78,3 +78,6 @@ Weights should always add up to 1.0 (100%)
 || 1Ch      || {{{float3[]}}} || Vertex normal ||
 || 28h      || {{{u8[4]}}}    || Vertex color ^???^ ||
 || 2Ch      || {{{float[2]}}} || Texture coordinate ||
+
+=== pl2TMB_Unknown ===
+Not sure what this is, something to do with the strings that follow after. Each entry is 40 bytes.
